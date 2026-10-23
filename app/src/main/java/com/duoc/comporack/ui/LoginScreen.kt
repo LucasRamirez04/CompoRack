@@ -1,75 +1,131 @@
 package com.duoc.comporack.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.duoc.comporack.viewmodel.LoginViewModel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.duoc.comporack.R
+import com.duoc.comporack.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    //variables de la vista
     navController: NavController,
     viewModel: LoginViewModel = viewModel()
-){
-    //columna principal del login
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween // Empuja los extremos
+) {
+    // Fondo oscuro que abarca toda la pantalla
+    Column(
+        modifier = Modifier.fillMaxSize().background(Color(0xFF0A1128)).padding(24.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center
     ) {
-        // 1. Imagen a la izquierda (Logo)
-        Image(
-            painter = painterResource(id = R.drawable.compo_rack_logo), // Reemplaza por tu recurso en res/drawable
-            contentDescription = "Logo CompoRack",
-            modifier = Modifier.size(150.dp)
+        //Fila para el logo + nombre app
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            //Imagen App
+            Image(
+                painter = painterResource(id = R.drawable.compo_rack_logo),
+                contentDescription = "Logo CompoRack",
+                modifier = Modifier.size(80.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            //Columna de Nombre App + Descripcion
+            Column{
+                Text(
+                    text = "CompoRack",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Control de Infraestructura",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color(0xFF64748B),
+                    letterSpacing = 1.2.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(36.dp))
+
+        //Titulo y subtitulo
+        Text(
+            text = "Inicio de Sesion",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 34.sp
+        )
+        Text(
+            text = "Inicia Sesion Con Tus Credenciales Institucionales",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color(0xFF94A3B8),
+            fontWeight = FontWeight.Bold,
+            lineHeight = 34.sp
         )
 
-        // 2. Columna con los textos a la derecha
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally // Alinea los textos hacia la derecha
-        ) {
-            Text(
-                text = "CompoRack",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color(0xFF2563EB)
-            )
+        Spacer(modifier = Modifier.height(32.dp))
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Control De Infraestructura",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+        //Input Usuario
+        OutlinedTextField(
+            value = viewModel.login.usuario,
+            onValueChange = { viewModel.actualizarUsuario(it)},
+            label = {Text("Usuario")},
+            isError = viewModel.errorUsuario.tieneError,
+            supportingText = {
+                if (viewModel.errorUsuario.tieneError) {
+                    Text(
+                        text = viewModel.errorUsuario.mensaje,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedBorderColor = Color(0xFF3B82F6),
+                unfocusedBorderColor = Color(0xFF334155),
+                focusedLabelColor = Color(0xFF3B82F6),
+                unfocusedLabelColor = Color(0xFF94A3B8)
             )
-        }
+        )
+
+
+
+
+
+
     }
 }
 
+
+
+// --- PREVIEW PARA ANDROID STUDIO ---
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LoginScreenPreview() {
-    // Aquí invocamos la pantalla
-    // Al ser una previsualización, podemos usar un NavController simulado
-    LoginScreen(
-        navController = androidx.navigation.compose.rememberNavController()
-    )
+fun VistaLogin() {
+    LoginScreen(navController = rememberNavController())
 }
