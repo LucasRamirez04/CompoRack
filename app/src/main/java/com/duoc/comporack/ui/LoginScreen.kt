@@ -29,9 +29,10 @@ import com.duoc.comporack.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
-    viewModel: LoginViewModel = viewModel()
+    navController: NavController
 ) {
+    //Intanciamos el LoginViewModel
+    val viewModel: LoginViewModel = viewModel()
     // Fondo oscuro que abarca toda la pantalla
     Column(
         modifier = Modifier.fillMaxSize().background(Color(0xFF0A1128)).padding(24.dp),
@@ -89,7 +90,7 @@ fun LoginScreen(
 
         //Input Usuario
         OutlinedTextField(
-            value = viewModel.login.usuario,
+            value = viewModel.usuario,
             onValueChange = { viewModel.actualizarUsuario(it)},
             label = {Text("Usuario")},
             isError = viewModel.errorUsuario.tieneError,
@@ -110,13 +111,14 @@ fun LoginScreen(
                 focusedBorderColor = Color(0xFF3B82F6),
                 unfocusedBorderColor = Color(0xFF334155),
                 focusedLabelColor = Color(0xFF3B82F6),
-                unfocusedLabelColor = Color(0xFF94A3B8)
+                unfocusedLabelColor = Color(0xFF94A3B8),
+                cursorColor = Color.White
             )
         )
 
         //Input Contraseña
         OutlinedTextField(
-            value = viewModel.login.contraseña,
+            value = viewModel.contraseña,
             onValueChange = { viewModel.actualizarContraseña(it)},
             label = {Text("Contraseña")},
             isError = viewModel.errorContraseña.tieneError,
@@ -131,7 +133,7 @@ fun LoginScreen(
             },
             singleLine = true,
             //Transforma el como el usuario ve la contraseña (el dato guardado no cambia)
-            visualTransformation = if (viewModel.login.contraseñaVisible) {
+            visualTransformation = if (viewModel.contraseñaVisible) {
                 //Muestra la contraseña como es
                 VisualTransformation.None
             } else{
@@ -144,7 +146,7 @@ fun LoginScreen(
             trailingIcon = {
                 IconButton(onClick = {viewModel.alternarVisibilidad()}) {
                     Icon(
-                        imageVector = if (viewModel.login.contraseñaVisible){
+                        imageVector = if (viewModel.contraseñaVisible){
                             //Icono ojo abierto
                             Icons.Filled.Visibility
                         }else{
@@ -163,7 +165,8 @@ fun LoginScreen(
                 focusedBorderColor = Color(0xFF3B82F6),
                 unfocusedBorderColor = Color(0xFF334155),
                 focusedLabelColor = Color(0xFF3B82F6),
-                unfocusedLabelColor = Color(0xFF94A3B8)
+                unfocusedLabelColor = Color(0xFF94A3B8),
+                cursorColor = Color.White
             )
         )
 
@@ -172,7 +175,7 @@ fun LoginScreen(
         Button(
             onClick = {
             if (viewModel.iniciarSesion()){
-                navController.navigate("rack")
+                navController.navigate("racks")
             }
         },
             modifier = Modifier
