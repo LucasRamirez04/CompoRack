@@ -35,8 +35,7 @@ fun LoginScreen(
     // Fondo oscuro que abarca toda la pantalla
     Column(
         modifier = Modifier.fillMaxSize().background(Color(0xFF0A1128)).padding(24.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.Start
     ) {
         //Fila para el logo + nombre app
         Row(
@@ -54,7 +53,7 @@ fun LoginScreen(
             Column{
                 Text(
                     text = "CompoRack",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
@@ -67,22 +66,23 @@ fun LoginScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(36.dp))
+
+        Spacer(modifier = Modifier.weight(1f))
 
         //Titulo y subtitulo
         Text(
-            text = "Inicio de Sesion",
+            text = "BIENVENIDO A COMPORACK",
             style = MaterialTheme.typography.headlineMedium,
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            lineHeight = 34.sp
+            lineHeight = 34.sp,
         )
         Text(
             text = "Inicia Sesion Con Tus Credenciales Institucionales",
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             color = Color(0xFF94A3B8),
             fontWeight = FontWeight.Bold,
-            lineHeight = 34.sp
+            lineHeight = 40.sp
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -93,6 +93,7 @@ fun LoginScreen(
             onValueChange = { viewModel.actualizarUsuario(it)},
             label = {Text("Usuario")},
             isError = viewModel.errorUsuario.tieneError,
+            //Mensaje que sale abajo del input si hay error
             supportingText = {
                 if (viewModel.errorUsuario.tieneError) {
                     Text(
@@ -113,12 +114,83 @@ fun LoginScreen(
             )
         )
 
+        //Input Contraseña
+        OutlinedTextField(
+            value = viewModel.login.contraseña,
+            onValueChange = { viewModel.actualizarContraseña(it)},
+            label = {Text("Contraseña")},
+            isError = viewModel.errorContraseña.tieneError,
+            //Mensaje que sale abajo del input si hay error
+            supportingText = {
+                if (viewModel.errorContraseña.tieneError) {
+                    Text(
+                        text = viewModel.errorContraseña.mensaje,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            singleLine = true,
+            //Transforma el como el usuario ve la contraseña (el dato guardado no cambia)
+            visualTransformation = if (viewModel.login.contraseñaVisible) {
+                //Muestra la contraseña como es
+                VisualTransformation.None
+            } else{
+                //Muesta la contraseña con puntos o asteriscos
+                PasswordVisualTransformation()
+            },
+            //Le diste al sistema como se comporta el teclado
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            //Agrega un elemento interactivo al lado derecho del inputs
+            trailingIcon = {
+                IconButton(onClick = {viewModel.alternarVisibilidad()}) {
+                    Icon(
+                        imageVector = if (viewModel.login.contraseñaVisible){
+                            //Icono ojo abierto
+                            Icons.Filled.Visibility
+                        }else{
+                            //Icono ojo tachado
+                            Icons.Filled.VisibilityOff
+                        },
+                        contentDescription = "Alternar Visibilidad",
+                        tint = Color(0xFF94A3B8)
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedBorderColor = Color(0xFF3B82F6),
+                unfocusedBorderColor = Color(0xFF334155),
+                focusedLabelColor = Color(0xFF3B82F6),
+                unfocusedLabelColor = Color(0xFF94A3B8)
+            )
+        )
 
-
-
-
-
-    }
+        Spacer(modifier = Modifier.height(24.dp))
+        //Boton Inciar Sesion
+        Button(
+            onClick = {
+            if (viewModel.iniciarSesion()){
+                navController.navigate("rack")
+            }
+        },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2563EB)
+            )
+            ) {
+            Text(
+                text = "Iniciar Sesion",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+    }//Llave cierre Column Principal
 }
 
 
