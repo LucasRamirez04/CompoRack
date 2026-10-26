@@ -10,9 +10,11 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.duoc.comporack.R
+import com.duoc.comporack.data.SessionManager
 import com.duoc.comporack.viewmodel.LoginViewModel
 
 @Composable
@@ -33,6 +36,10 @@ fun LoginScreen(
 ) {
     //Intanciamos el LoginViewModel
     val viewModel: LoginViewModel = viewModel()
+    //Instanciamos el SessionManager
+    val context = LocalContext.current
+    val sessionManager : SessionManager = remember {SessionManager(context)}
+
     // Fondo oscuro que abarca toda la pantalla
     Column(
         modifier = Modifier.fillMaxSize().background(Color(0xFF0A1128)).padding(24.dp),
@@ -175,7 +182,10 @@ fun LoginScreen(
         Button(
             onClick = {
             if (viewModel.iniciarSesion()){
-                navController.navigate("racks")
+                sessionManager.guardarSesion(viewModel.usuario)
+                navController.navigate("racks"){
+                    popUpTo("login"){ inclusive = true} //se elimina login del historial para el boton volver
+                }
             }
         },
             modifier = Modifier
