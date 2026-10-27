@@ -32,5 +32,9 @@ fun Navegacion(){
         composable(route = "resumen"){
             ResumenScreen(navController = navController)
         }
+        //Ruta 4: Perfil
+        composable(route = "perfil") {
+            PerfilScreen(navController = navController)
+        }
     }
 }
