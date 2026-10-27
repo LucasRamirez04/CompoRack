@@ -26,7 +26,7 @@ fun Navegacion(){
         }
         //Ruta 2: Racks
         composable(route = "racks"){
-            RacksScreen(navController = navController)
+            RackScreen(navController = navController)
         }
         //Ruta 3: Resumen
         composable(route = "resumen"){
