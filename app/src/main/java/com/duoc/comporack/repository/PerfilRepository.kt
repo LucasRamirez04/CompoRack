@@ -7,7 +7,7 @@ class PerfilRepository {
     private var peticion = ""
     private var errorPeticion = MensajeError()
 
-    // Solo el usuario cambia (viene del login). Rol e ID de empleado son datos fijos de ejemplo
+    // Solo el usuario cambia (viene del login). Rol e ID de empleado son datos ejemplo
     fun obtenerPerfil(usuario: String): PerfilModel = PerfilModel(
         usuario = usuario,
         rol = "Inspector Técnico OT / IT",
