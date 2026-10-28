@@ -257,7 +257,7 @@ private fun CampoSoloLectura(etiqueta: String, valor: String) {
 
 // Paleta colores
 @Composable
-private fun coloresCampo() = OutlinedTextFieldDefaults.colors(
+fun coloresCampo() = OutlinedTextFieldDefaults.colors(
     focusedTextColor = Color.White,
     unfocusedTextColor = Color.White,
     focusedBorderColor = Color(0xFF3B82F6),
