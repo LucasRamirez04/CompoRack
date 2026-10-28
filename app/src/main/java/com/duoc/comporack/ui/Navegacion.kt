@@ -36,5 +36,9 @@ fun Navegacion(){
         composable(route = "perfil") {
             PerfilScreen(navController = navController)
         }
+        //Ruta 5: Nuevo registro
+        composable(route = "nuevo_registro") {
+            NuevoRegistroScreen(navController = navController)
+        }
     }
 }
