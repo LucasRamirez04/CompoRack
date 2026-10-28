@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,7 +44,7 @@ fun RackScreen(
     val state = viewModel.uiState
 
     Scaffold(
-        bottomBar = { NavegacionInferiorCompoRack(navController) },
+        bottomBar = { BarraNavegacion(navController = navController, rutaActual = "racks") },
         containerColor = Color(0xFF0A1128)
     ) { paddingValues ->
         Column(
@@ -54,7 +55,7 @@ fun RackScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            SeccionEncabezado()
+            SeccionEncabezado(onPerfilClick = { navController.navigate("perfil") })
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -126,7 +127,7 @@ fun RackScreen(
 }
 
 @Composable
-fun SeccionEncabezado() {
+fun SeccionEncabezado(onPerfilClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -146,21 +147,22 @@ fun SeccionEncabezado() {
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = "DC MADRID · SALA PRINCIPAL",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFF64748B)
-                )
             }
         }
         Box(
             modifier = Modifier
                 .size(40.dp)
+                .clip(RoundedCornerShape(8.dp))
                 .border(1.dp, Color(0xFF334155), RoundedCornerShape(8.dp))
-                .background(Color(0xFF0F172A)),
+                .background(Color(0xFF0F172A))
+                .clickable { onPerfilClick() },
             contentAlignment = Alignment.Center
         ) {
-            Text("JP", color = Color(0xFF3B82F6), fontWeight = FontWeight.Bold)
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Ir al Perfil",
+                tint = Color(0xFF3B82F6)
+            )
         }
     }
 }
@@ -344,56 +346,5 @@ fun TarjetaRack(rack: RackItem, onClick: () -> Unit) {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun NavegacionInferiorCompoRack(navController: NavController) {
-    NavigationBar(
-        containerColor = Color(0xFF0A1128),
-        tonalElevation = 8.dp,
-        modifier = Modifier
-            .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-    ) {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.GridView, contentDescription = "Racks") },
-            label = { Text("Racks") },
-            selected = true,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF3B82F6),
-                selectedTextColor = Color(0xFF3B82F6),
-                indicatorColor = Color.Transparent,
-                unselectedIconColor = Color(0xFF64748B),
-                unselectedTextColor = Color(0xFF64748B)
-            )
-        )
-        Box(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .size(54.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFF2563EB))
-                .clickable { navController.navigate("nuevo_registro/escaneo") },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.QrCodeScanner,
-                contentDescription = "Escáner",
-                tint = Color.White,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.PersonOutline, contentDescription = "Perfil") },
-            label = { Text("Perfil") },
-            selected = false,
-            onClick = { navController.navigate("perfil") },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = Color(0xFF64748B),
-                unselectedTextColor = Color(0xFF64748B)
-            )
-        )
     }
 }
