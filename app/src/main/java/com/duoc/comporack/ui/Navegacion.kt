@@ -32,11 +32,15 @@ fun Navegacion(){
         composable(route = "resumen"){
             ResumenScreen(navController = navController)
         }
-        //Ruta 4: Perfil
+        //Ruta 4: Detalle Rack
+        composable(route = "detalle_rack"){
+            DetalleRackScreen(navController = navController)
+        }
+        //Ruta 5: Perfil
         composable(route = "perfil") {
             PerfilScreen(navController = navController)
         }
-        //Ruta 5: Nuevo registro
+        //Ruta 6: Nuevo registro
         composable(route = "nuevo_registro") {
             NuevoRegistroScreen(navController = navController)
         }
