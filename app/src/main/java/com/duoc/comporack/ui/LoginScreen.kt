@@ -1,5 +1,6 @@
 package com.duoc.comporack.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.duoc.comporack.R
 import com.duoc.comporack.data.SessionManager
 import com.duoc.comporack.viewmodel.LoginViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -39,6 +42,17 @@ fun LoginScreen(
     //Instanciamos el SessionManager
     val context = LocalContext.current
     val sessionManager : SessionManager = remember {SessionManager(context)}
+
+    // Cuando termina la carga deja 1 segundo visible el mensaje de exito, guarda la sesion y entra a la app
+    LaunchedEffect(viewModel.ingresoExitoso) {
+        if (viewModel.ingresoExitoso) {
+            delay(1000)
+            sessionManager.guardarSesion(viewModel.usuario)
+            navController.navigate("racks"){
+                popUpTo("login"){ inclusive = true} //se elimina login del historial para el boton volver
+            }
+        }
+    }
 
     // Fondo oscuro que abarca toda la pantalla
     Column(
@@ -180,30 +194,44 @@ fun LoginScreen(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
-        //Boton Inciar Sesion
+        //Boton Inciar Sesion (se desactiva mientras carga o ya ingreso)
         Button(
-            onClick = {
-            if (viewModel.iniciarSesion()){
-                sessionManager.guardarSesion(viewModel.usuario)
-                navController.navigate("racks"){
-                    popUpTo("login"){ inclusive = true} //se elimina login del historial para el boton volver
-                }
-            }
-        },
+            onClick = { viewModel.ingresar() },
+            enabled = !viewModel.cargando && !viewModel.ingresoExitoso,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2563EB)
+                containerColor = Color(0xFF2563EB),
+                disabledContainerColor = Color(0xFF1E40AF)
             )
-            ) {
+        ) {
+            if (viewModel.cargando) {
+                //Circulo de carga que reemplaza el texto del boton durante los 2 segundos
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 3.dp
+                )
+            } else {
+                Text(
+                    text = "Iniciar Sesion",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+
+        //Mensaje de exito que aparece al terminar la carga
+        AnimatedVisibility(visible = viewModel.ingresoExitoso) {
             Text(
-                text = "Iniciar Sesion",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                text = "✔ Ingreso exitoso. ¡Bienvenido, ${viewModel.usuario}!",
+                color = Color(0xFF22C55E),
+                modifier = Modifier.padding(top = 12.dp)
             )
         }
+
         Spacer(modifier = Modifier.weight(1f))
     }//Llave cierre Column Principal
 }
