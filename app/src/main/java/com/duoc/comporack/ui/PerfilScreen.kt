@@ -264,7 +264,8 @@ fun coloresCampo() = OutlinedTextFieldDefaults.colors(
     unfocusedBorderColor = Color(0xFF334155),
     focusedLabelColor = Color(0xFF3B82F6),
     unfocusedLabelColor = Color(0xFF94A3B8),
-    cursorColor = Color.White
+    cursorColor = Color.White,
+    errorTextColor = Color.White
 )
 
 // --- PREVIEW PARA ANDROID STUDIO ---
