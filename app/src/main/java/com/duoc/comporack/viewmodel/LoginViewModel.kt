@@ -4,8 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duoc.comporack.model.MensajeError
 import com.duoc.comporack.repository.LoginRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
 
@@ -25,6 +28,14 @@ class LoginViewModel : ViewModel() {
         private set
 
     var errorContraseña by mutableStateOf(MensajeError())
+        private set
+
+    // true mientras se muestra el circulo de carga
+    var cargando by mutableStateOf(false)
+        private set
+
+    // true cuando termino la carga y se debe mostrar el mensaje de ingreso exitoso
+    var ingresoExitoso by mutableStateOf(false)
         private set
 
     // Actualizaciones directas con asignación '='
@@ -47,5 +58,17 @@ class LoginViewModel : ViewModel() {
         errorUsuario = repository.getErrorUsuario()
         errorContraseña = repository.getErrorContraseña()
         return esValido
+    }
+
+    // Valida los campos y, si estan bien, simula 2 segundos de carga antes de ingresar
+    fun ingresar() {
+        if (!iniciarSesion()) return
+
+        viewModelScope.launch {
+            cargando = true
+            delay(2000)
+            cargando = false
+            ingresoExitoso = true
+        }
     }
 }
