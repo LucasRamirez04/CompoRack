@@ -63,27 +63,31 @@ fun TopBarDetalle(navController: NavController) {
                 .background(Color(0xFF0F172A))
                 .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
         ) {
-            Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Volver", tint = Color.White, modifier = Modifier.size(18.dp))
+            Icon(
+                imageVector = Icons.Default.ArrowBackIosNew,
+                contentDescription = "Volver",
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
+            )
         }
-
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Detalle del Rack", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text("SALA PRINCIPAL", color = Color(0xFF64748B), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(
+                text = "Detalle del Rack",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "SALA PRINCIPAL",
+                color = Color(0xFF64748B),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
         }
-
-        IconButton(
-            onClick = { },
-            modifier = Modifier
-                .size(44.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFF0F172A))
-                .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
-        ) {
-            Icon(Icons.Default.MoreHoriz, contentDescription = "Opciones", tint = Color.White)
-        }
+        Spacer(modifier = Modifier.size(44.dp))
     }
 }
-
 @Composable
 fun TarjetaRackSeleccionado() {
     Card(
