@@ -47,15 +47,22 @@ fun NuevoRegistroScreen(
         viewModel.actualizarPermisoCamara(concedido)
     }
 
-    // Muestra la notificacion, cierra el modal y vuelve a la pantalla anterior
+    // Envia el registro a la API, la notificacion sale cuando el guardado es exitoso
     val finalizarRegistro: () -> Unit = {     // () -> Unit funcion sin parametros que no devuelve nada
-        NotificacionHelper.mostrarRegistroGuardado(
-            context,
-            viewModel.rack,
-            viewModel.cantidadConfirmados
-        )
-        viewModel.cerrarFinalizar()
-        navController.popBackStack()
+        viewModel.finalizarRegistro()
+    }
+
+    // Cuando registroGuardado pasa a true (PATCH exitoso): notificacion, cierra el modal y vuelve atras
+    LaunchedEffect(viewModel.registroGuardado) {
+        if (viewModel.registroGuardado) {
+            NotificacionHelper.mostrarRegistroGuardado(
+                context,
+                viewModel.rack,
+                viewModel.cantidadConfirmados
+            )
+            viewModel.cerrarFinalizar()
+            navController.popBackStack()
+        }
     }
 
     // Lanzador con o sin permiso se finaliza el registro, notificación solo aparece si hay permiso
@@ -146,15 +153,9 @@ fun NuevoRegistroScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "S/N: ${componente.serie}",
+                        text = "S/N: ${componente.num_serie}",
                         color = Color(0xFF94A3B8),
                         fontSize = 13.sp
-                    )
-                    Text(
-                        text = "${componente.coincidencia}% de coincidencia",
-                        color = Color(0xFF22C55E),
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
             },
@@ -204,9 +205,10 @@ fun NuevoRegistroScreen(
             confirmButton = {
                 Button(
                     onClick = { viewModel.enviarCodigoManual() },
+                    enabled = !viewModel.cargando,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
                 ) {
-                    Text("Validar")
+                    Text(if (viewModel.cargando) "Validando..." else "Validar")
                 }
             },
             dismissButton = {
@@ -226,10 +228,20 @@ fun NuevoRegistroScreen(
                 Text(text = "Finalizar registro", color = Color.White)
             },
             text = {
-                Text(
-                    text = "Has confirmado ${viewModel.cantidadConfirmados} de ${viewModel.totalEsperado} componentes. ¿Deseas finalizar el registro?",
-                    color = Color(0xFF94A3B8)
-                )
+                Column {
+                    Text(
+                        text = "Has confirmado ${viewModel.cantidadConfirmados} de ${viewModel.totalEsperado} componentes. ¿Deseas finalizar el registro?",
+                        color = Color(0xFF94A3B8)
+                    )
+                    // Error del PATCH (sin conexion o del servidor)
+                    if (viewModel.errorFinalizar.tieneError) {
+                        Text(
+                            text = viewModel.errorFinalizar.mensaje,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
             },
             confirmButton = {
                 Button(
@@ -243,9 +255,10 @@ fun NuevoRegistroScreen(
                             finalizarRegistro()
                         }
                     },
+                    enabled = !viewModel.cargando,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
                 ) {
-                    Text("Finalizar")
+                    Text(if (viewModel.cargando) "Guardando..." else "Finalizar")
                 }
             },
             dismissButton = {
@@ -315,7 +328,7 @@ private fun ColumnScope.PasoPresencia(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
             ) {
                 Text(
-                    text = "Simular lectura QR de RACK-A01",
+                    text = "Simular lectura QR del rack",
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
