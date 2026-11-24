@@ -33,7 +33,7 @@ class ResumenViewModel (): ViewModel() {
             cargando = true
             mensajeError = null
             try {
-                repository.obtenerRegistroAnterior(rackId, nombreTecnico)
+                registro = repository.obtenerRegistroAnterior(rackId, nombreTecnico)
             }catch (e: Exception){
                 mensajeError = "No se pudo cargar el resumen desde el servidor"
             }finally {
