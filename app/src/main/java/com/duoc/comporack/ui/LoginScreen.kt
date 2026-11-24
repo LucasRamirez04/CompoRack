@@ -47,7 +47,9 @@ fun LoginScreen(
     LaunchedEffect(viewModel.ingresoExitoso) {
         if (viewModel.ingresoExitoso) {
             delay(1000)
-            sessionManager.guardarSesion(viewModel.usuario)
+            viewModel.usuarioAutenticado?.let { user ->
+                sessionManager.guardarSesion(user.id,user.nom_usuario,user.rol)
+            }
             navController.navigate("racks"){
                 popUpTo("login"){ inclusive = true} //se elimina login del historial para el boton volver
             }
@@ -226,7 +228,7 @@ fun LoginScreen(
         //Mensaje de exito que aparece al terminar la carga
         AnimatedVisibility(visible = viewModel.ingresoExitoso) {
             Text(
-                text = "✔ Ingreso exitoso. ¡Bienvenido, ${viewModel.usuario}!",
+                text = "✔ Ingreso exitoso. ¡Bienvenido, ${viewModel.usuarioAutenticado?.nom_usuario ?: viewModel.usuario}!",
                 color = Color(0xFF22C55E),
                 modifier = Modifier.padding(top = 12.dp)
             )
