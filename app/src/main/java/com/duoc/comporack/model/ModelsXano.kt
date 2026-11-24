@@ -18,7 +18,11 @@ data class Racks(
     val utlimaInspeccion: Long? = null,
     val capacidad: Int = 0,
     val esOperativo: Boolean = true
+)
 
-
-
+data class ComponenteRack(
+    val id: Int = 0,
+    val nombre: String = "",
+    val categoria: String = "",
+    val num_serie: String = ""
 )
