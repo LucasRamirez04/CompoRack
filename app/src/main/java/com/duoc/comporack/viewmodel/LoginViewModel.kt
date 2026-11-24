@@ -7,8 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duoc.comporack.model.MensajeError
 import com.duoc.comporack.repository.LoginRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import com.duoc.comporack.model.Usuario
 
 class LoginViewModel : ViewModel() {
 
@@ -38,6 +39,8 @@ class LoginViewModel : ViewModel() {
     var ingresoExitoso by mutableStateOf(false)
         private set
 
+    var usuarioAutenticado by mutableStateOf<Usuario?>(null)
+
     // Actualizaciones directas con asignación '='
     fun actualizarUsuario(nuevoUsuario: String) {
         usuario = nuevoUsuario
@@ -55,20 +58,34 @@ class LoginViewModel : ViewModel() {
 
     fun iniciarSesion(): Boolean {
         val esValido = repository.validarCredenciales()
-        errorUsuario = repository.getErrorUsuario()
-        errorContraseña = repository.getErrorContraseña()
+        val errUser = repository.getErrorUsuario()
+        val errPass = repository.getErrorContraseña()
+        errorUsuario = MensajeError(tieneError = errUser.tieneError, mensaje = errUser.mensaje)
+        errorContraseña = MensajeError(tieneError = errPass.tieneError, mensaje = errPass.mensaje)
         return esValido
     }
 
-    // Valida los campos y, si estan bien, simula 2 segundos de carga antes de ingresar
+    // Valida los campos
     fun ingresar() {
         if (!iniciarSesion()) return
 
         viewModelScope.launch {
             cargando = true
-            delay(2000)
-            cargando = false
-            ingresoExitoso = true
+            try {
+                val userXano = repository.iniciarSesionApi()
+                usuarioAutenticado = userXano
+                ingresoExitoso = true
+            } catch (e: HttpException) {
+                // Xano lanzó el Throw Error (400 Bad Request) por credenciales inválidas
+                repository.mostrarErrorCredenciales("Usuario o contraseña incorrectos")
+                errorContraseña = MensajeError(tieneError = true, mensaje = "Usuario o contraseña incorrectos")
+            } catch (e: Exception) {
+                // Error de red (sin internet o URL de Xano incorrecta)
+                repository.mostrarErrorCredenciales("Error de conexión con el servidor")
+                errorContraseña = MensajeError(tieneError = true, mensaje = "Error de conexión con el servidor")
+            } finally {
+                cargando = false
+            }
         }
     }
 }

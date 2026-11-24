@@ -9,10 +9,12 @@ class SessionManager (context: Context){
 
 
     //Funcion para agregar los datos usuario y estado de inicio de sesion al archivo XML
-    fun guardarSesion(nombre: String){
+    fun guardarSesion(id: Int, nombre: String, rol: String){
         doc.edit().apply {
             putBoolean("SesionIniciada",true)
-            putString("Usuario",nombre)
+            putInt("UsuarioId", id)
+            putString("NombreUsuario",nombre)
+            putString("Rol",rol)
             apply()
         }
     }
@@ -22,17 +24,28 @@ class SessionManager (context: Context){
         return doc.getBoolean("SesionIniciada",false)
     }
 
-    //Funcion para obtener el nombre y mostralo en el perfil
+    //Funcion para obtener el idUsuario y mostrarlo en el perfil
+    fun obtenerIdUsuario(): Int{
+        return doc.getInt("UsuarioId",-1)
+    }
+
+    //Funcion para obtener el nombre y mostrarlo en el perfil
     fun obtenerUsuario(): String{
-        //Funcion para cerrar la sesion al apretar el boton "cerrar sesion (vista perfil)"
-        return doc.getString("Usuario","") ?: ""
+        return doc.getString("NombreUsuario","") ?: ""
+    }
+
+    //Funcion para obtener el rol y mostrarlo en el perfil
+    fun obtenerRol(): String{
+        return doc.getString("Rol","") ?: ""
     }
 
     //Funcion para cerrar la sesion al apretar el boton "cerrar sesion (vista perfil)"
     fun cerrarSesion(){
         doc.edit().apply {
             putBoolean("SesionIniciada",false)
-            putString("Usuario","")
+            putInt("UsuarioId",-1)
+            putString("NombreUsuario","")
+            putString("Rol","")
             apply()
         }
     }
