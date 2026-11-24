@@ -135,7 +135,7 @@ fun RackScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    listOf("Todos", "Fila A", "Fila B").forEach { fila ->
+                    listOf("Todos", "Zona A", "Zona B", "Zona C").forEach { fila ->
                         Button(
                             onClick = { viewModel.aplicarFiltroUbicacion(fila) },
                             modifier = Modifier
