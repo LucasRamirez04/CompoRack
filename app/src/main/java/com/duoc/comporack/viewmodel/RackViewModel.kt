@@ -4,9 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.duoc.comporack.model.RackItem
+import androidx.lifecycle.viewModelScope
 import com.duoc.comporack.model.RackUiState
+import com.duoc.comporack.model.Racks
 import com.duoc.comporack.repository.RackRepository
+import kotlinx.coroutines.launch
 
 class RackViewModel(
     private val repository: RackRepository = RackRepository()
@@ -15,29 +17,34 @@ class RackViewModel(
     var uiState by mutableStateOf(RackUiState())
         private set
 
-    private var listaBaseRacks = emptyList<RackItem>()
+    private var listaOriginal: List<Racks> = emptyList()
 
     init {
         cargarRacks()
     }
 
-    private fun cargarRacks() {
-        listaBaseRacks = repository.obtenerRacks()
-        uiState = uiState.copy(racks = listaBaseRacks)
+    fun cargarRacks() {
+        viewModelScope.launch {
+            uiState = uiState.copy(cargando = true, error = null)
+            try {
+                val respuesta = repository.obtenerRacks()
+                listaOriginal = respuesta
+                uiState = uiState.copy(
+                    racks = respuesta,
+                    cargando = false
+                )
+            } catch (e: Exception) {
+                uiState = uiState.copy(
+                    cargando = false,
+                    error = "Error al conectar con Xano: ${e.localizedMessage}"
+                )
+            }
+        }
     }
 
-    fun actualizarBusqueda(nuevoTexto: String) {
-        val error = if (nuevoTexto.contains(Regex("[^a-zA-Z0-9\\s-]"))) {
-            "No se permiten caracteres especiales"
-        } else {
-            null
-        }
-
-        uiState = uiState.copy(busqueda = nuevoTexto, errorBusqueda = error)
-
-        if (error == null) {
-            filtrarRacks()
-        }
+    fun actualizarBusqueda(texto: String) {
+        uiState = uiState.copy(busqueda = texto, errorBusqueda = null)
+        aplicarFiltros()
     }
 
     fun alternarModalFiltro(mostrar: Boolean) {
@@ -45,24 +52,24 @@ class RackViewModel(
     }
 
     fun aplicarFiltroUbicacion(ubicacion: String) {
-        uiState = uiState.copy(filtroUbicacion = ubicacion, mostrandoModalFiltro = false)
-        filtrarRacks()
+        uiState = uiState.copy(
+            filtroUbicacion = ubicacion,
+            mostrandoModalFiltro = false
+        )
+        aplicarFiltros()
     }
 
-    private fun filtrarRacks() {
-        val resultados = listaBaseRacks.filter { rack ->
-            val coincideTexto = rack.id.contains(uiState.busqueda, ignoreCase = true) ||
+    private fun aplicarFiltros() {
+        val filtrados = listaOriginal.filter { rack ->
+            val coincideTexto = uiState.busqueda.isBlank() ||
+                    "RACK-${rack.id}".contains(uiState.busqueda, ignoreCase = true) ||
                     rack.ubicacion.contains(uiState.busqueda, ignoreCase = true)
 
-            val coincideUbicacion = if (uiState.filtroUbicacion == "Todos") {
-                true
-            } else {
-                rack.ubicacion.contains(uiState.filtroUbicacion, ignoreCase = true)
-            }
+            val coincideUbicacion = uiState.filtroUbicacion == "Todos" ||
+                    rack.ubicacion.contains(uiState.filtroUbicacion, ignoreCase = true)
 
             coincideTexto && coincideUbicacion
         }
-
-        uiState = uiState.copy(racks = resultados)
+        uiState = uiState.copy(racks = filtrados)
     }
 }
