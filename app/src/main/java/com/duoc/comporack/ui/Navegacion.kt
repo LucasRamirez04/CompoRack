@@ -2,9 +2,11 @@ package com.duoc.comporack.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.duoc.comporack.data.SessionManager
 
 @Composable
@@ -33,8 +35,12 @@ fun Navegacion(){
             ResumenScreen(navController = navController)
         }
         //Ruta 4: Detalle Rack
-        composable(route = "detalle_rack"){
-            DetalleRackScreen(navController = navController)
+        composable(
+            route = "detalle_rack/{rackId}",
+            arguments = listOf(navArgument("rackId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val rackId = backStackEntry.arguments?.getInt("rackId") ?: 0
+            DetalleRackScreen(navController = navController, rackId = rackId)
         }
         //Ruta 5: Perfil
         composable(route = "perfil") {
