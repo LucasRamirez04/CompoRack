@@ -86,7 +86,7 @@ fun DetalleRackScreen(
                 state.rack != null -> {
                     TarjetaRackSeleccionado(rack = state.rack)
                     Spacer(modifier = Modifier.height(16.dp))
-                    BotonesAccion(navController = navController)
+                    BotonesAccion(navController = navController, rackId = state.rack.id)
                     Spacer(modifier = Modifier.height(24.dp))
                     SeccionEstadoActual(rack = state.rack)
                 }
@@ -218,7 +218,7 @@ fun TarjetaRackSeleccionado(rack: Racks) {
 }
 
 @Composable
-fun BotonesAccion(navController: NavController) {
+fun BotonesAccion(navController: NavController, rackId: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -249,7 +249,7 @@ fun BotonesAccion(navController: NavController) {
             modifier = Modifier
                 .weight(1f)
                 .height(80.dp)
-                .clickable { navController.navigate("resumen") },
+                .clickable { navController.navigate("resumen/$rackId") },
             colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
             shape = RoundedCornerShape(16.dp),
             border = CardDefaults.outlinedCardBorder(true).copy(
