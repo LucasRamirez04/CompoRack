@@ -31,8 +31,15 @@ fun Navegacion(){
             RackScreen(navController = navController)
         }
         //Ruta 3: Resumen
-        composable(route = "resumen"){
-            ResumenScreen(navController = navController)
+        composable(
+            route = "resumen/{rackId}",
+            arguments = listOf(navArgument("rackId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val idRecibido = backStackEntry.arguments?.getInt("rackId") ?: 1
+            ResumenScreen(
+                navController = navController,
+                rackId = idRecibido
+            )
         }
         //Ruta 4: Detalle Rack
         composable(
