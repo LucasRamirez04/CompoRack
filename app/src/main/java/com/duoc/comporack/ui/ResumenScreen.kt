@@ -8,9 +8,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,14 +21,25 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.duoc.comporack.data.SessionManager
 import com.duoc.comporack.model.EstadoRevision
 import com.duoc.comporack.viewmodel.ResumenViewModel
 
 @Composable
 fun ResumenScreen(
     navController: NavController,
+    rackId: Int = 1,
     viewModel: ResumenViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
+
+    LaunchedEffect(rackId) {
+        viewModel.cargarResumen(
+            rackId = rackId,
+            nombreTecnico = sessionManager.obtenerUsuario()
+        )
+    }
     val registro = viewModel.registro
 
     // Fondo oscuro uniforme de toda la app
