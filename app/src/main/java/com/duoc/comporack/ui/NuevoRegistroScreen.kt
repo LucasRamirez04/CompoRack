@@ -31,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.duoc.comporack.viewmodel.NuevoRegistroViewModel
+import com.duoc.comporack.data.NotificacionHelper
 
 @Composable
 fun NuevoRegistroScreen(
@@ -44,6 +45,24 @@ fun NuevoRegistroScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { concedido ->
         viewModel.actualizarPermisoCamara(concedido)
+    }
+
+    // Muestra la notificacion, cierra el modal y vuelve a la pantalla anterior
+    val finalizarRegistro: () -> Unit = {     // () -> Unit funcion sin parametros que no devuelve nada
+        NotificacionHelper.mostrarRegistroGuardado(
+            context,
+            viewModel.rack,
+            viewModel.cantidadConfirmados
+        )
+        viewModel.cerrarFinalizar()
+        navController.popBackStack()
+    }
+
+    // Lanzador con o sin permiso se finaliza el registro, notificación solo aparece si hay permiso
+    val lanzadorPermisoNotificacion = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { _ ->  //  El _ reemplaza al valor concedido o rechazado porque no se necesita para finalizar
+        finalizarRegistro()
     }
 
     // Al abrir la vista si ya hay permiso lo usa, si no lo solicita
@@ -215,8 +234,14 @@ fun NuevoRegistroScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.cerrarFinalizar()
-                        navController.popBackStack()
+                        // tienePermiso() ya devuelve true en Android 12 o inferior, donde no se pide permiso
+                        val faltaPermiso = !NotificacionHelper.tienePermiso(context)
+
+                        if (faltaPermiso) {
+                            lanzadorPermisoNotificacion.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            finalizarRegistro()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
                 ) {

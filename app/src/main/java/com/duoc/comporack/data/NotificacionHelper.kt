@@ -11,7 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 
-// Objeto unico (igual que RetrofitInstance), no se crean instancias
+// Objeto unico no se crean instancias
 object NotificacionHelper {
 
     // Identificador del canal, siempre el mismo texto para que Android agrupe las notificaciones
