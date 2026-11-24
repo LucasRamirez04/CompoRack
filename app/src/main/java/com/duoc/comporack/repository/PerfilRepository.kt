@@ -2,17 +2,21 @@ package com.duoc.comporack.repository
 
 import com.duoc.comporack.model.MensajeError
 import com.duoc.comporack.model.PerfilModel
+import com.duoc.comporack.remote.RetrofitInstance
 
 class PerfilRepository {
     private var peticion = ""
     private var errorPeticion = MensajeError()
 
-    // Solo el usuario cambia (viene del login). Rol e ID de empleado son datos ejemplo
-    fun obtenerPerfil(usuario: String): PerfilModel = PerfilModel(
-        usuario = usuario,
-        rol = "Inspector Técnico OT / IT",
-        idEmpleado = "CMC-OT-0842"
-    )
+    // GET usuario/{id} trae el usuario desde Xano y arma el perfil con su rol (id de ejemplo)
+    suspend fun obtenerPerfil(idUsuario: Int): PerfilModel {
+        val usuarioApi = RetrofitInstance.api.getUsuario(idUsuario)
+        return PerfilModel(
+            usuario = usuarioApi.nom_usuario,
+            rol = usuarioApi.rol,
+            idEmpleado = "CMC-OT-0842"
+        )
+    }
 
     fun getErrorPeticion(): MensajeError = errorPeticion
 
