@@ -38,9 +38,12 @@ fun PerfilScreen(
     val sessionManager: SessionManager = remember { SessionManager(context) }
     val perfil = viewModel.perfil
 
-    // Al abrir la vista, carga el usuario que se guardó al iniciar sesión
+    // Al abrir la vista, pide el perfil a la API con el id guardado al iniciar sesión
     LaunchedEffect(Unit) {
-        viewModel.cargarPerfil(sessionManager.obtenerUsuario())
+        viewModel.cargarPerfil(
+            usuarioSesion = sessionManager.obtenerUsuario(),
+            idUsuario = sessionManager.obtenerIdUsuario()
+        )
     }
 
     Scaffold(
@@ -126,6 +129,22 @@ fun PerfilScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            // Círculo de carga mientras llega la respuesta de Xano
+            if (viewModel.cargando) {
+                CircularProgressIndicator(color = Color(0xFF3B82F6))
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            // Mensaje de error si fallo la API
+            if (viewModel.mensajeError.tieneError) {
+                Text(
+                    text = viewModel.mensajeError.mensaje,
+                    color = Color(0xFFEF4444),
+                    fontSize = 13.sp
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
             Text(
                 text = "INFORMACIÓN PROFESIONAL",
