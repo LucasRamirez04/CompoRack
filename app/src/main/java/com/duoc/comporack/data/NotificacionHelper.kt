@@ -15,7 +15,7 @@ import androidx.core.content.ContextCompat
 object NotificacionHelper {
 
     // Identificador del canal, siempre el mismo texto para que Android agrupe las notificaciones
-    private const val ID_CANAL = "canal_registros"
+    private const val ID_CANAL = "canal_registros_alta"
 
     // Numero que identifica la notificacion. Evita acumular si se envia otra con el mismo numero
     private const val ID_NOTIFICACION_REGISTRO = 1
@@ -36,7 +36,7 @@ object NotificacionHelper {
             val canal = NotificationChannel(
                 ID_CANAL,
                 "Registros de racks",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             )
             canal.description = "Avisos cuando se guarda un registro"
 
@@ -61,6 +61,7 @@ object NotificacionHelper {
             .setSmallIcon(android.R.drawable.ic_dialog_info) // Ícono pequeño obligatorio (ícono del sistema)
             .setContentTitle("Registro guardado")
             .setContentText("$rack: $cantidadComponentes componentes registrados")
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // Prioridad alta en Android 7 o inferior
             .setAutoCancel(true) // Desaparece al tocarla
             .build()
 
