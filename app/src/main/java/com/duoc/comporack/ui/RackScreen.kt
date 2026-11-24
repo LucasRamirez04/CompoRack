@@ -108,7 +108,7 @@ fun RackScreen(
                             ) {
                                 TarjetaRack(
                                     rack = rack,
-                                    onClick = { navController.navigate("detalle_rack") }
+                                    onClick = { navController.navigate("detalle_rack/${rack.id}") }
                                 )
                             }
                         }
