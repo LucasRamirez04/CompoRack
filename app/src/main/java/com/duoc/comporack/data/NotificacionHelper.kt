@@ -32,7 +32,7 @@ object NotificacionHelper {
     // Un canal es una categoria de notificaciones que puede silenciar o desactivar
     private fun crearCanal(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // IMPORTANCE_DEFAULT suena y aparece en la barra de estado sin interrumpir la pantalla
+            // IMPORTANCE_HIGH suena y aparece en la barra de estado y la pantalla
             val canal = NotificationChannel(
                 ID_CANAL,
                 "Registros de racks",
