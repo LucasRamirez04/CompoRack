@@ -12,8 +12,6 @@ class LoginRepository {
     private var errorContraseña = MensajeError()
 
     //--- Funciones Gets ---
-    fun getLogin() : LoginModel = login
-
     fun getErrorUsuario() : MensajeError = errorUsuario
 
     fun getErrorContraseña() : MensajeError = errorContraseña
@@ -25,10 +23,6 @@ class LoginRepository {
 
     fun actualizarContraseña(nuevaContraseña : String){
         login.contraseña = nuevaContraseña
-    }
-
-    fun alternarVisibilidad(){
-        login.contraseñaVisible = !login.contraseñaVisible
     }
 
     //--- Funciones Validaciones ---
