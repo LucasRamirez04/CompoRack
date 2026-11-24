@@ -44,5 +44,33 @@ Aplicación móvil desarrollada en **Android con Jetpack Compose** para la gesti
 5. **`ResumenScreen`:** Visualización de la ultima inspeccion del rack.
 6. **`Perfil`:** Vista donde se muestra la informacion principal del usuario.
 
+---
+
+## Consumo de API REST (Xano + Retrofit)
+
+Se reemplazaron los datos simulados por consultas reales a **Xano** mediante **Retrofit** y **Coroutines** bajo arquitectura **MVVM + Repository**:
+
+* `POST auth/login` — Autenticación de usuario y guardado de sesión (`SessionManager`).
+* `GET usuario/{usuario_id}` — Consulta de datos del perfil del técnico por ID.
+* `GET racks` — Listado general de racks.
+* `GET racks/{racks_id}` — Detalle y resumen de un rack específico por ID.
+* `PATCH racks/{racks_id}` — Actualización del rack luego de realizar un registro.
+* `GET componentes_racks` — Listado de todos los componentes registrados.
+* `GET componentes_racks/validar/{num_serie}` — Validación manual del código/número de serie de un componente.
 
 ---
+
+## Pruebas Unitarias (JUnit 4)
+
+Se incorporaron pruebas unitarias automatizadas con **JUnit 4** (`src/test/java/com/duoc/comporack/viewmodel/`) para validar la lógica de negocio y el manejo de estados reactivos en los `ViewModel` de forma aislada antes del envío de datos:
+
+* **`PerfilViewModelTest`:**
+  * Verifica que una petición de cambio de datos vacía active el estado de error (`"La petición no puede estar vacía"`), impida el envío y mantenga abierto el modal.
+  * Verifica la validación de longitud mínima (`"Describe el cambio con al menos 10 caracteres"`) ante entradas demasiado cortas.
+  * Verifica que una petición válida marque `peticionEnviada = true`, cierre el modal y limpie errores previos.
+
+---
+
+## APK Firmada (Release)
+
+Se generó y firmó el paquete de instalación `app-release.apk` mediante certificado digital propio (`Keystore` JKS) en Android Studio, ubicado en `app/release/app-release.apk` para instalación directa en dispositivos Android.
