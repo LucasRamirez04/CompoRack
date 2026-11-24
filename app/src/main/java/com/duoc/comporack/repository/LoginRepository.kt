@@ -2,6 +2,8 @@ package com.duoc.comporack.repository
 
 import com.duoc.comporack.model.LoginModel
 import com.duoc.comporack.model.MensajeError
+import com.duoc.comporack.model.Usuario
+import com.duoc.comporack.remote.RetrofitInstance
 
 class LoginRepository {
     //Instanciar Models
@@ -58,5 +60,17 @@ class LoginRepository {
         var usuarioValidado = validarUsuario()
         var contraseñaValidada = validarContraseña()
         return usuarioValidado && contraseñaValidada
+    }
+
+    //nueva funcion para validar credenciales con la api
+    suspend fun iniciarSesionApi(): Usuario{
+       val datos = Usuario(nom_usuario = login.usuario, contrasena = login.contraseña)
+        return RetrofitInstance.api.login(datos)
+    }
+
+    //funcion para manejar los errores de la api
+    fun mostrarErrorCredenciales(mensaje: String = "Usuario o contraseña incorrectos") {
+        errorContraseña.tieneError = true
+        errorContraseña.mensaje = mensaje
     }
 }
