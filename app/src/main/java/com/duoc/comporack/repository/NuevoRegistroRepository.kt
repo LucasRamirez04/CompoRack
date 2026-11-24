@@ -1,49 +1,49 @@
 package com.duoc.comporack.repository
 
-import com.duoc.comporack.model.ComponenteDetectado
+import com.duoc.comporack.model.ComponenteRack
 import com.duoc.comporack.model.MensajeError
-import com.duoc.comporack.model.RegistroModel
+import com.duoc.comporack.model.Racks
+import com.duoc.comporack.remote.RetrofitInstance
+
+// Id del rack que "lee" el QR simulado
+private const val ID_RACK_SIMULADO = 1
 
 class NuevoRegistroRepository {
-    private var registro = RegistroModel()
-    private val componentesConfirmados = mutableListOf<ComponenteDetectado>()
+    // Rack validado en el paso 1 (de Xano)
+    private var rackActual: Racks? = null
 
-    // Catálogo ficticio de componentes (datos de prueba)
-    private val catalogo = listOf(
-        ComponenteDetectado("Cisco Catalyst 9300", "SWITCH DE RED", "FCW2536L0AB", 96),
-        ComponenteDetectado("Patch Panel 24p", "CONECTIVIDAD", "PP24-A01-038", 94),
-        ComponenteDetectado("Dell PowerEdge R750", "SERVIDOR", "8DJ4XM3", 98),
-        ComponenteDetectado("UPS Eaton 9PX", "ENERGÍA", "ETN9PX-9281", 97),
-        ComponenteDetectado("APC Rack PDU 2G", "DISTRIBUCIÓN", "PDU-APC-8941", 95)
-    )
+    // Componentes de Xano (reemplaza catalogo fijo)
+    private var catalogo: List<ComponenteRack> = emptyList()
+    private val componentesConfirmados = mutableListOf<ComponenteRack>()
 
-    val totalEsperado: Int = catalogo.size
+    fun totalEsperado(): Int = catalogo.size
 
     // Paso 1: validación de que exista
-    // Simula lectura del QR pegado en el rack
-    fun leerQrRack(): String = "RACK-A01"
+    // Simula la lectura del QR pegado en el rack: entrega el id del rack
+    fun leerQrRack(): Int = ID_RACK_SIMULADO
 
-    // Valida que el código leído tenga formato de rack y lo guarda en el registro
-    fun validarRack(codigo: String): Boolean {
-        if (!codigo.startsWith("RACK-")) {
-            registro.rackValidado = false
-            return false
-        }
-        registro.rack = codigo
-        registro.rackValidado = true
-        return true
+    // GET racks/{id}: si el rack no existe, Retrofit lanza HttpException
+    suspend fun validarRack(id: Int): Racks {
+        val rackEncontrado = RetrofitInstance.api.getRackbyId(id)
+        rackActual = rackEncontrado
+        return rackEncontrado
+    }
+
+    // GET componentes_racks: trae la lista de componentes de la base de datos
+    suspend fun cargarCatalogo() {
+        catalogo = RetrofitInstance.api.getComponentes()
     }
 
     // Paso 2: componentes
-    // Simula la lectura del codigo de barras: entrega el siguiente componente del catalogo
-    fun leerComponente(): ComponenteDetectado =
-        catalogo[componentesConfirmados.size % catalogo.size]
+    // Simula la lectura codigo y entrega el siguiente componente de la lista
+    // Devuelve null si ya no quedan componentes
+    fun leerComponente(): ComponenteRack? = catalogo.getOrNull(componentesConfirmados.size)
 
-    // Igual que la lectura, pero usando el código escrito a mano
-    fun leerComponenteManual(codigo: String): ComponenteDetectado =
-        leerComponente().copy(serie = codigo.uppercase(), coincidencia = 100)
+    // GET componentes_racks/validar/{num_serie}: valida codigo escrito a mano
+    suspend fun validarComponenteManual(codigo: String): ComponenteRack =
+        RetrofitInstance.api.validarComponente(codigo.uppercase())
 
-    // Valida el código ingresado manualmente
+    // Valida el formato del código antes de consultar a la API
     fun validarCodigoManual(codigo: String): MensajeError {
         if (codigo.isBlank()) {
             return MensajeError(true, "El código no puede estar vacío")
@@ -57,9 +57,16 @@ class NuevoRegistroRepository {
         return MensajeError()
     }
 
-    fun confirmarComponente(componente: ComponenteDetectado) {
+    fun confirmarComponente(componente: ComponenteRack) {
         componentesConfirmados.add(componente)
     }
 
     fun cantidadConfirmados(): Int = componentesConfirmados.size
+
+    // PATCH racks/{id}: actualiza la fecha de ultima inspeccion del rack
+    suspend fun finalizarRegistro() {
+        val rack = rackActual ?: return
+        val rackActualizado = rack.copy(ultimaInspeccion = System.currentTimeMillis())
+        RetrofitInstance.api.actualizarRack(rack.id, rackActualizado)
+    }
 }
