@@ -13,12 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.PersonOutline
-import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,8 +29,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.duoc.comporack.R
-import com.duoc.comporack.model.RackItem
+import com.duoc.comporack.model.Racks
 import com.duoc.comporack.viewmodel.RackViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,19 +70,48 @@ fun RackScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.racks, key = { it.id }) { rack ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + slideInVertically(initialOffsetY = { 40 })
+            when {
+                state.cargando -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Color(0xFF3B82F6))
+                    }
+                }
+
+                state.error != null -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = state.error,
+                                color = Color(0xFFEF4444),
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(
+                                onClick = { viewModel.cargarRacks() },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+                            ) {
+                                Text("Reintentar", color = Color.White)
+                            }
+                        }
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        TarjetaRack(
-                            rack = rack,
-                            onClick = { navController.navigate("detalle_rack") }
-                        )
+                        items(state.racks, key = { it.id }) { rack ->
+                            AnimatedVisibility(
+                                visible = true,
+                                enter = fadeIn() + slideInVertically(initialOffsetY = { 40 })
+                            ) {
+                                TarjetaRack(
+                                    rack = rack,
+                                    onClick = { navController.navigate("detalle_rack") }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -276,7 +305,7 @@ fun SeccionBusquedaYFiltro(
 }
 
 @Composable
-fun TarjetaRack(rack: RackItem, onClick: () -> Unit) {
+fun TarjetaRack(rack: Racks, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -304,7 +333,7 @@ fun TarjetaRack(rack: RackItem, onClick: () -> Unit) {
                     modifier = Modifier.size(36.dp)
                 )
                 Text(
-                    text = rack.capacidad,
+                    text = "${rack.capacidad}U",
                     color = Color(0xFF64748B),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
@@ -316,7 +345,7 @@ fun TarjetaRack(rack: RackItem, onClick: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = rack.id,
+                        text = "RACK-${rack.id}",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -339,12 +368,22 @@ fun TarjetaRack(rack: RackItem, onClick: () -> Unit) {
                 Text(text = rack.ubicacion, color = Color(0xFF94A3B8), fontSize = 12.sp)
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "ÚLTIMA INSPECCIÓN  ${rack.ultimaInspeccion}",
+                    text = "ÚLTIMA INSPECCIÓN  ${formatearFecha(rack.ultimaInspeccion)}",
                     color = Color(0xFF64748B),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
+    }
+}
+
+private fun formatearFecha(timestamp: Long?): String {
+    if (timestamp == null || timestamp == 0L) return "Sin registro"
+    return try {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        sdf.format(Date(timestamp))
+    } catch (e: Exception) {
+        "Sin registro"
     }
 }
